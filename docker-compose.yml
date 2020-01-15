@@ -1,0 +1,7 @@
+version: '3.5'
+services:
+  rss_aggregator_frontend:
+    build:
+      context: .
+    ports:
+      - 80:3000

@@ -1,21 +1,17 @@
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import MuiAlert from '@material-ui/lab/Alert';
-import { makeStyles, Divider, Snackbar, IconButton, ListItem, List, Hidden, TextField, Fab } from '@material-ui/core';
-import RefreshIcon from '@material-ui/icons/Refresh';
+import { makeStyles, Divider, Snackbar, IconButton, List, Hidden, TextField, Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import Checkbox from '@material-ui/core/Checkbox';
 
 import { FetchItemsContext } from '../../../context/fetch-items-context';
 import axios from '../../../shared/backendAxios';
 import { isUrl } from '../../../shared/validations';
 import Spinner from '../../Spinner/Spinner';
+import Item from './Item/Item';
 import styles from './Drawer.module.css';
 
 const useStyles = makeStyles(theme => ({
-  listItemRoot: {
-    padding: 8,
-  },
   toolbar: {
     ...theme.mixins.toolbar,
     [theme.breakpoints.down('md')]: {
@@ -131,6 +127,23 @@ const DrawerContent = props => {
     [rssFeeds, setSnackBarOptions, rssFeedsIsChecked, sendGetItemsRequests],
   );
 
+  const onClickDeleteButton = useCallback(
+    async id => {
+      try {
+        const index = rssFeeds.findIndex(rssFeed => rssFeed.id === id);
+        rssFeeds.splice(index, 1);
+        rssFeedsIsChecked.splice(index, 1);
+        setRssFeeds(rssFeeds);
+        setRssFeedsIsChecked(rssFeedsIsChecked);
+        await axios.delete(`/feeds/${id}`);
+        setSnackBarOptions(true, 'Successfully deleted', 'success');
+      } catch (error) {
+        setSnackBarOptions(true, 'Error deleting feed', 'error');
+      }
+    },
+    [setSnackBarOptions, rssFeeds, rssFeedsIsChecked],
+  );
+
   const onClickAddButton = useCallback(() => {
     if (isUrl(rssLink)) {
       addLink(rssLink);
@@ -188,20 +201,15 @@ const DrawerContent = props => {
         {isFetched &&
           rssFeeds.map((rssFeed, index) => {
             return (
-              <React.Fragment key={rssFeed.id}>
-                <ListItem classes={{ root: classes.listItemRoot }}>
-                  <Checkbox color="primary" checked={rssFeedsIsChecked[index]} onClick={() => onClickCheckBox(index)} />
-                  <div className={styles.contentContainer}>
-                    <div>{rssFeed.title}</div>
-                    <div>
-                      <IconButton aria-label="refresh" color="primary" onClick={() => fetchData(rssFeed.id)}>
-                        <RefreshIcon />
-                      </IconButton>
-                    </div>
-                  </div>
-                </ListItem>
-                <Divider />
-              </React.Fragment>
+              <Item
+                key={`item-${index}`}
+                isChecked={rssFeedsIsChecked[index]}
+                rssFeed={rssFeed}
+                index={index}
+                onClickCheckBox={onClickCheckBox}
+                onClickRefresh={fetchData}
+                onClickDelete={onClickDeleteButton}
+              />
             );
           })}
       </List>

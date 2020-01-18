@@ -52,6 +52,9 @@ const FeedItems = () => {
     if (fetchItemsContext.feedIds) {
       setOffset(1);
       getItemsByFeedIds(fetchItemsContext.feedIds, 1);
+    } else {
+      setItems([]);
+      setNumOfItems(0);
     }
   }, [fetchItemsContext, getItemsByFeedIds]);
 

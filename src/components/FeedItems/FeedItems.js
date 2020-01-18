@@ -38,26 +38,26 @@ const FeedItems = () => {
   }, []);
 
   const getItemsByFeedIds = useCallback(
-    async feedIds => {
+    async (feedIds, offset) => {
       setIsFetched(false);
       const data = await getItems({ feedId: feedIds, offset });
       setItems(data.items);
       setNumOfItems(data.numOfResults);
       setIsFetched(true);
     },
-    [getItems, offset],
+    [getItems],
   );
 
   useEffect(() => {
     if (fetchItemsContext.feedIds) {
       setOffset(1);
-      getItemsByFeedIds(fetchItemsContext.feedIds);
+      getItemsByFeedIds(fetchItemsContext.feedIds, 1);
     }
   }, [fetchItemsContext, getItemsByFeedIds]);
 
   const handlePaginationClick = useCallback(
     offset => {
-      getItemsByFeedIds(fetchItemsContext.feedIds);
+      getItemsByFeedIds(fetchItemsContext.feedIds, offset);
       setOffset(offset);
     },
     [fetchItemsContext.feedIds, getItemsByFeedIds],

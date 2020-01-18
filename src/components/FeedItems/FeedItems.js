@@ -1,18 +1,32 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Grid } from '@material-ui/core';
+import { Grid, makeStyles } from '@material-ui/core';
+import Pagination from 'material-ui-flat-pagination';
 
 import FeedItem from './FeedItem/FeedItem';
 import styles from './FeedItems.module.css';
 import axios from '../../shared/backendAxios';
 import Spinner from '../Spinner/Spinner';
 import NoContent from '../NoContent/NoContent';
+import { RESULTS_PER_PAGE } from '../../shared/constants';
 import { FetchItemsContext } from '../../context/fetch-items-context';
+
+const useStyles = makeStyles(theme => ({
+  paginationRoot: {
+    background: '#ffffff',
+    borderRadius: '5px',
+    boxShadow: '0px 1px 3px 0px rgba(0,0,0,0.25)',
+  },
+}));
 
 const FeedItems = () => {
   const fetchItemsContext = useContext(FetchItemsContext);
 
+  const classes = useStyles();
+
   const [items, setItems] = useState([]);
-  const [isFetched, setIsFetched] = useState(false);
+  const [numOfItems, setNumOfItems] = useState(0);
+  const [offset, setOffset] = useState(1);
+  const [isFetched, setIsFetched] = useState(true);
 
   const getItems = useCallback(async queryParams => {
     try {
@@ -26,21 +40,28 @@ const FeedItems = () => {
   const getItemsByFeedIds = useCallback(
     async feedIds => {
       setIsFetched(false);
-      const promises = [];
-      for (let i = 0; i < feedIds.length; i += 1) {
-        const feedId = feedIds[i];
-        promises.push(getItems({ feedId }));
-      }
-      const results = await Promise.all(promises);
-      setItems(results.reduce((prev, cur) => prev.concat(cur), []));
+      const data = await getItems({ feedId: feedIds, offset });
+      setItems(data.items);
+      setNumOfItems(data.numOfResults);
       setIsFetched(true);
     },
-    [getItems],
+    [getItems, offset],
   );
 
   useEffect(() => {
-    getItemsByFeedIds(fetchItemsContext.feedIds);
+    if (fetchItemsContext.feedIds) {
+      setOffset(1);
+      getItemsByFeedIds(fetchItemsContext.feedIds);
+    }
   }, [fetchItemsContext, getItemsByFeedIds]);
+
+  const handlePaginationClick = useCallback(
+    offset => {
+      getItemsByFeedIds(fetchItemsContext.feedIds);
+      setOffset(offset);
+    },
+    [fetchItemsContext.feedIds, getItemsByFeedIds],
+  );
 
   return (
     <div className={styles.container}>
@@ -62,6 +83,19 @@ const FeedItems = () => {
             </Grid>
           ))}
       </Grid>
+      {isFetched && items.length !== 0 && (
+        <div className={styles.paginationContainer}>
+          <Pagination
+            limit={RESULTS_PER_PAGE}
+            offset={offset}
+            total={numOfItems}
+            classes={{
+              root: classes.paginationRoot,
+            }}
+            onClick={(e, offset) => handlePaginationClick(offset)}
+          />
+        </div>
+      )}
     </div>
   );
 };

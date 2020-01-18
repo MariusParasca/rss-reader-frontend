@@ -77,7 +77,7 @@ const DrawerContent = props => {
           feedIds.push(rssFeed.id);
         }
       }
-      fetchItemsContext.changeFeedIds(feedIds);
+      fetchItemsContext.changeFeedIds(feedIds.join(';'));
     },
     [fetchItemsContext, rssFeeds],
   );

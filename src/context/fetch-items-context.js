@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
 export const FetchItemsContext = React.createContext({
-  feedId: [],
+  feedIds: '',
   changeToFetch: () => {},
 });
 
 const FetchItemsContextProvider = props => {
-  const [feedIds, setFeedIds] = useState([]);
+  const [feedIds, setFeedIds] = useState('');
 
   const changeHandler = feedIds => {
     setFeedIds(feedIds);

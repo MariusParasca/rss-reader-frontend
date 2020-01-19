@@ -1,5 +1,5 @@
 import Axios from 'axios';
 
 export default Axios.create({
-  baseURL: 'http://localhost:2001/',
+  baseURL: 'https://fathomless-lowlands-46228.herokuapp.com/',
 });

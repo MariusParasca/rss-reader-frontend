@@ -7,9 +7,13 @@ export const FetchItemsContext = React.createContext({
 
 const FetchItemsContextProvider = props => {
   const [feedIds, setFeedIds] = useState('');
+  const [forceRefresh, setForceRefresh] = useState(true);
 
-  const changeHandler = feedIds => {
+  const changeHandler = (feedIds, force) => {
     setFeedIds(feedIds);
+    if (force) {
+      setForceRefresh(!forceRefresh);
+    }
   };
 
   return (

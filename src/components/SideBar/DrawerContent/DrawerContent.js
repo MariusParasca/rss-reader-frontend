@@ -64,7 +64,7 @@ const DrawerContent = props => {
   }, [rssLink]);
 
   const sendGetItemsRequests = useCallback(
-    isRssFeedsChecked => {
+    (isRssFeedsChecked, force) => {
       const feedIds = [];
 
       for (let i = 0; i < rssFeeds.length; i += 1) {
@@ -73,7 +73,8 @@ const DrawerContent = props => {
           feedIds.push(rssFeed.id);
         }
       }
-      fetchItemsContext.changeFeedIds(feedIds.join(';'));
+
+      fetchItemsContext.changeFeedIds(feedIds.join(';'), force);
     },
     [fetchItemsContext, rssFeeds],
   );
@@ -92,7 +93,7 @@ const DrawerContent = props => {
     async id => {
       try {
         await axios.get(`fetch/${id}`);
-        sendGetItemsRequests(rssFeedsIsChecked);
+        sendGetItemsRequests(rssFeedsIsChecked, true);
         setSnackBarOptions(true, 'Data fetched successfully', 'success');
       } catch (error) {
         setSnackBarOptions(true, 'Error getting feeds', 'error');

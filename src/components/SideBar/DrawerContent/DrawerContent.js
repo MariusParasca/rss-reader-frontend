@@ -135,13 +135,14 @@ const DrawerContent = props => {
         rssFeedsIsChecked.splice(index, 1);
         setRssFeeds(rssFeeds);
         setRssFeedsIsChecked(rssFeedsIsChecked);
+        sendGetItemsRequests(rssFeedsIsChecked);
         await axios.delete(`/feeds/${id}`);
         setSnackBarOptions(true, 'Successfully deleted', 'success');
       } catch (error) {
         setSnackBarOptions(true, 'Error deleting feed', 'error');
       }
     },
-    [setSnackBarOptions, rssFeeds, rssFeedsIsChecked],
+    [setSnackBarOptions, rssFeeds, rssFeedsIsChecked, sendGetItemsRequests],
   );
 
   const onClickAddButton = useCallback(() => {

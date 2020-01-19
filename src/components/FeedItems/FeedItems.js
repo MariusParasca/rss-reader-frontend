@@ -25,7 +25,7 @@ const FeedItems = () => {
 
   const [items, setItems] = useState([]);
   const [numOfItems, setNumOfItems] = useState(0);
-  const [offset, setOffset] = useState(1);
+  const [offset, setOffset] = useState(0);
   const [isFetched, setIsFetched] = useState(true);
 
   const getItems = useCallback(async queryParams => {
@@ -50,8 +50,8 @@ const FeedItems = () => {
 
   useEffect(() => {
     if (fetchItemsContext.feedIds) {
-      setOffset(1);
-      getItemsByFeedIds(fetchItemsContext.feedIds, 1);
+      setOffset(0);
+      getItemsByFeedIds(fetchItemsContext.feedIds, 0);
     } else {
       setItems([]);
       setNumOfItems(0);
